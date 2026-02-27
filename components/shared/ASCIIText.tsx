@@ -125,10 +125,10 @@ class AsciiFilter {
     if (this.context) {
       this.context.font = `${this.fontSize}px ${this.fontFamily}`;
       const charWidth = this.context.measureText("A").width;
-      this.cols = Math.floor(
+      this.cols = Math.ceil(
         this.width / (this.fontSize * (charWidth / this.fontSize))
       );
-      this.rows = Math.floor(this.height / this.fontSize);
+      this.rows = Math.ceil(this.height / this.fontSize);
       this.canvas.width = this.cols;
       this.canvas.height = this.rows;
       this.pre.style.fontFamily = this.fontFamily;
@@ -136,6 +136,8 @@ class AsciiFilter {
       this.pre.style.margin = "0";
       this.pre.style.padding = "0";
       this.pre.style.lineHeight = "1em";
+      this.pre.style.whiteSpace = "pre";
+      this.pre.style.overflow = "visible";
       this.pre.style.position = "absolute";
       this.pre.style.left = "50%";
       this.pre.style.top = "50%";
@@ -246,11 +248,12 @@ class CanvasTxt {
     if (this.context) {
       this.context.font = this.font;
       const metrics = this.context.measureText(this.txt);
-      const textWidth = Math.ceil(metrics.width) + 20;
+      const pad = Math.ceil(this.fontSize * 0.3);
+      const textWidth = Math.ceil(metrics.width) + pad * 2;
       const textHeight =
         Math.ceil(
           metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
-        ) + 20;
+        ) + pad * 2;
       this.canvas.width = textWidth;
       this.canvas.height = textHeight;
     }
@@ -262,8 +265,9 @@ class CanvasTxt {
       this.context.fillStyle = this.color;
       this.context.font = this.font;
       const metrics = this.context.measureText(this.txt);
-      const yPos = 10 + metrics.actualBoundingBoxAscent;
-      this.context.fillText(this.txt, 10, yPos);
+      const pad = Math.ceil(this.fontSize * 0.3);
+      const yPos = pad + metrics.actualBoundingBoxAscent;
+      this.context.fillText(this.txt, pad, yPos);
     }
   }
 
@@ -419,7 +423,7 @@ class CanvAscii {
       const planeH = this.geometry.parameters.height;
       const fovRad = (this.camera.fov * Math.PI) / 180;
       const halfTan = Math.tan(fovRad / 2);
-      const margin = 1.15;
+      const margin = 1.3;
       const zForHeight = (planeH * margin) / (2 * halfTan);
       const zForWidth = (planeW * margin) / (2 * halfTan * (w / h));
       this.camera.position.z = Math.max(zForWidth, zForHeight, 15);
@@ -671,10 +675,9 @@ export default function ASCIIText({
           user-select: none;
           padding: 0;
           line-height: 1em;
+          white-space: pre;
+          overflow: visible;
           text-align: left;
-          position: absolute;
-          left: 0;
-          top: 0;
           background-image: linear-gradient(135deg, #FFD54F 0%, #FFC107 40%, #FFB300 70%, #FF8F00 100%);
           background-attachment: fixed;
           -webkit-text-fill-color: transparent;

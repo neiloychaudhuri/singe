@@ -117,7 +117,7 @@ export default function ExportCard({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: isStory ? "32px" : "20px",
+          gap: isStory ? "36px" : "28px",
         }}
       >
         {/* Username */}
@@ -140,9 +140,11 @@ export default function ExportCard({
             color: tier.color,
             fontWeight: 900,
             fontSize: isStory ? "128px" : "88px",
-            lineHeight: 0.9,
+            lineHeight: 1,
             fontVariantNumeric: "tabular-nums",
             letterSpacing: "-0.02em",
+            textAlign: "center" as const,
+            width: "100%",
           }}
         >
           {score}
@@ -153,8 +155,10 @@ export default function ExportCard({
           style={{
             display: "flex",
             alignItems: "center",
+            justifyContent: "center",
             gap: "10px",
-            marginTop: isStory ? "4px" : "2px",
+            marginTop: isStory ? "8px" : "6px",
+            width: "100%",
           }}
         >
           <span style={{ fontSize: isStory ? "28px" : "22px" }}>
@@ -276,7 +280,7 @@ export default function ExportCard({
             letterSpacing: "0.05em",
           }}
         >
-          singe.vercel.app
+          getsinged.vercel.app
         </span>
       </div>
     </div>

@@ -5,6 +5,7 @@ import {
   downloadCard,
   copyCardToClipboard,
   shareCard,
+  renderCardToBlob,
 } from "@/lib/exportCard";
 import { posthog } from "@/lib/posthog";
 
@@ -20,7 +21,7 @@ export default function ShareButton({ score, tierLabel }: Props) {
 
   const elementId = `export-card-${format}`;
   const shareText = `I scored ${score}/100 on Singe — ${tierLabel}. How cooked are you?`;
-  const siteUrl = "https://singe.vercel.app";
+  const siteUrl = "https://getsinged.vercel.app";
 
   const handleDownload = async () => {
     setBusy("download");
@@ -53,10 +54,23 @@ export default function ShareButton({ score, tierLabel }: Props) {
   const handleTweet = async () => {
     setBusy("tweet");
     try {
-      await downloadCard(elementId, `singe-${format}`);
+      const blob = await renderCardToBlob(elementId);
+      if (blob) {
+        const file = new File([blob], "singe-score.png", { type: "image/png" });
+        const tweetText = `${shareText}\n\n${siteUrl}`;
+
+        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ text: tweetText, files: [file] });
+          posthog.capture("card_exported", { format, method: "tweet_share" });
+          setBusy(null);
+          return;
+        }
+
+        await downloadCard(elementId, `singe-${format}`);
+      }
       posthog.capture("card_exported", { format, method: "tweet" });
     } catch (err) {
-      console.error("Download for tweet failed:", err);
+      console.error("Tweet share failed:", err);
     } finally {
       setBusy(null);
     }
