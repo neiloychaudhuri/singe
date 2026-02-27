@@ -34,9 +34,20 @@ export default function Home() {
             />
           </div>
         </div>
-        <p className="text-zinc-500 text-lg max-w-md mx-auto">
-          Answer 6 quick questions. Get a brutally honest score,
-          an AI-powered roast, and a hype-up you didn&apos;t ask for.
+        <p className="text-zinc-500 text-base max-w-lg mx-auto leading-relaxed">
+          <span className="syntax-comment">// answer </span>
+          <span className="syntax-number">6</span>
+          <span className="syntax-comment"> quick questions</span>
+          <br />
+          <span className="syntax-keyword">const</span>{" "}
+          <span className="syntax-fn">result</span>{" "}
+          <span className="text-zinc-400">=</span>{" "}
+          <span className="syntax-fn">singe</span>
+          <span className="text-zinc-400">(</span>
+          <span className="syntax-string">&quot;your_life&quot;</span>
+          <span className="text-zinc-400">);</span>
+          <br />
+          <span className="syntax-comment">// brutally honest score + AI roast + hype</span>
         </p>
       </div>
       <SingeForm />

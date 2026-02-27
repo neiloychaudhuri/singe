@@ -18,11 +18,12 @@ export default function LeaderboardPage() {
   return (
     <div className="flex flex-col items-center gap-8 px-4 py-12 min-h-[calc(100vh-65px)]">
       <div className="text-center">
-        <h1 className="text-4xl font-black text-zinc-100 tracking-tight mb-2">
-          Leaderboard
+        <h1 className="text-4xl font-black tracking-tight mb-2">
+          <span className="syntax-fn">leaderboard</span>
+          <span className="text-zinc-400">()</span>
         </h1>
         <p className="text-zinc-500 text-sm">
-          Top 50 most cooked humans, ranked by Singe Score
+          <span className="syntax-comment">// top 50 most cooked humans, sorted by score desc</span>
         </p>
       </div>
 

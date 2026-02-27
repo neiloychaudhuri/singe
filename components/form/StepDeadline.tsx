@@ -19,8 +19,11 @@ export default function StepDeadline({
 
   return (
     <div className="flex flex-col items-center gap-8">
-      <h2 className="text-2xl font-bold text-zinc-100 tracking-tight">
-        How many hours until your next deadline?
+      <h2 className="text-2xl font-bold tracking-tight">
+        <span className="syntax-keyword">deadline</span>
+        <span className="text-zinc-400">.</span>
+        <span className="syntax-fn">timeRemaining</span>
+        <span className="text-zinc-400">()</span>
       </h2>
       <div className="relative w-full max-w-sm">
         <input

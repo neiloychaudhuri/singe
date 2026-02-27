@@ -130,8 +130,12 @@ function ResultContent() {
 
       {!leaderboardSubmitted ? (
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 w-full max-w-sm flex flex-col items-center gap-4">
-          <h3 className="text-zinc-100 font-bold text-sm">
-            Submit to Leaderboard?
+          <h3 className="font-bold text-sm">
+            <span className="syntax-fn">submit</span>
+            <span className="text-zinc-400">(</span>
+            <span className="syntax-string">leaderboard</span>
+            <span className="text-zinc-400">)</span>
+            <span className="text-zinc-500">?</span>
           </h3>
           <input
             type="text"

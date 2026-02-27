@@ -13,8 +13,13 @@ export default function StepSleep({ value, onChange, onNext }: Props) {
 
   return (
     <div className="flex flex-col items-center gap-8">
-      <h2 className="text-2xl font-bold text-zinc-100 tracking-tight">
-        How many hours did you sleep last night?
+      <h2 className="text-2xl font-bold tracking-tight">
+        <span className="syntax-fn">sleep</span>
+        <span className="text-zinc-400">(</span>
+        <span className="syntax-string">hours</span>
+        <span className="text-zinc-400">)</span>
+        <span className="text-zinc-600"> — </span>
+        <span className="text-zinc-300">last night?</span>
       </h2>
       <div className="relative w-full max-w-sm">
         <input
