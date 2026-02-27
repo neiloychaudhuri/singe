@@ -72,16 +72,6 @@ function scoreGrass(hours: number): number {
   ]);
 }
 
-function scoreVibe(vibe: number): number {
-  return lerp(vibe, [
-    [1, 100],
-    [2, 65],
-    [3, 40],
-    [4, 20],
-    [5, 0],
-  ]);
-}
-
 export function calculateSingeScore(inputs: FormInputs): number {
   const subscales = {
     sleep: scoreSleep(inputs.sleepHours),
@@ -89,7 +79,6 @@ export function calculateSingeScore(inputs: FormInputs): number {
     tabs: scoreTabs(inputs.tabs),
     deadline: scoreDeadline(inputs.hoursToDeadline),
     grass: scoreGrass(inputs.hoursSinceGrass),
-    vibe: scoreVibe(inputs.vibeCheck),
   };
 
   const weights: Record<string, number> = {
@@ -97,8 +86,7 @@ export function calculateSingeScore(inputs: FormInputs): number {
     caffeine: 0.15,
     tabs: 0.15,
     deadline: 0.25,
-    grass: 0.1,
-    vibe: 0.05,
+    grass: 0.15,
   };
 
   return Math.round(

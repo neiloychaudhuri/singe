@@ -5,11 +5,12 @@ import { useState } from "react";
 interface Props {
   value: number;
   onChange: (val: number) => void;
-  onNext: () => void;
+  onSubmit?: () => void;
+  onNext?: () => void;
   onBack: () => void;
 }
 
-export default function StepGrass({ value, onChange, onNext, onBack }: Props) {
+export default function StepGrass({ value, onChange, onSubmit, onNext, onBack }: Props) {
   const [local, setLocal] = useState(value);
 
   return (
@@ -52,10 +53,10 @@ export default function StepGrass({ value, onChange, onNext, onBack }: Props) {
           Back
         </button>
         <button
-          onClick={onNext}
+          onClick={onSubmit || onNext}
           className="px-8 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-lg transition-colors text-lg"
         >
-          Next
+          {onSubmit ? "Get Singed" : "Next"}
         </button>
       </div>
     </div>

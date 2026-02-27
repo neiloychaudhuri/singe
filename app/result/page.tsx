@@ -35,12 +35,6 @@ function ResultContent() {
     tabs: parseInt(searchParams.get("tabs") || "10"),
     hoursToDeadline: parseInt(searchParams.get("hoursToDeadline") || "12"),
     hoursSinceGrass: parseInt(searchParams.get("hoursSinceGrass") || "4"),
-    vibeCheck: parseInt(searchParams.get("vibeCheck") || "3") as
-      | 1
-      | 2
-      | 3
-      | 4
-      | 5,
   };
 
   const saveStreak = useCallback(() => {
@@ -162,7 +156,7 @@ function ResultContent() {
         </div>
       )}
 
-      <ShareButton disabled={!readout} />
+      <ShareButton />
 
       <Link
         href="/leaderboard"
@@ -188,6 +182,7 @@ function ResultContent() {
         tier={tier}
         readout={readout || ""}
         streak={streak}
+        inputs={inputs}
         format="square"
         username={username.trim() || undefined}
       />
@@ -196,6 +191,7 @@ function ResultContent() {
         tier={tier}
         readout={readout || ""}
         streak={streak}
+        inputs={inputs}
         format="story"
         username={username.trim() || undefined}
       />

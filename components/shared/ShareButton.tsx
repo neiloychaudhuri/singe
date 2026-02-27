@@ -4,11 +4,7 @@ import { useState } from "react";
 import { exportCard } from "@/lib/exportCard";
 import { posthog } from "@/lib/posthog";
 
-interface Props {
-  disabled?: boolean;
-}
-
-export default function ShareButton({ disabled }: Props) {
+export default function ShareButton() {
   const [format, setFormat] = useState<"square" | "story">("square");
   const [exporting, setExporting] = useState(false);
 
@@ -50,7 +46,7 @@ export default function ShareButton({ disabled }: Props) {
       </div>
       <button
         onClick={handleExport}
-        disabled={disabled || exporting}
+        disabled={exporting}
         className="px-8 py-3 bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold rounded-lg transition-colors text-lg"
       >
         {exporting ? "Exporting..." : "Export Card"}

@@ -1,12 +1,13 @@
 "use client";
 
-import { Tier } from "@/types";
+import { FormInputs, Tier } from "@/types";
 
 interface Props {
   score: number;
   tier: Tier;
   readout: string;
   streak: number;
+  inputs: FormInputs;
   format: "square" | "story";
   username?: string;
 }
@@ -16,19 +17,28 @@ export default function ExportCard({
   tier,
   readout,
   streak,
+  inputs,
   format,
   username,
 }: Props) {
   const width = 540;
   const height = format === "square" ? 540 : 960;
   const truncatedReadout =
-    readout.length > 140 ? readout.slice(0, 140) + "..." : readout;
+    readout.length > 120 ? readout.slice(0, 120) + "..." : readout;
 
   const today = new Date().toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
+
+  const stats = [
+    { label: "Sleep", value: `${inputs.sleepHours}h`, icon: "🛏️" },
+    { label: "Coffees", value: `${inputs.coffees}`, icon: "☕" },
+    { label: "Tabs", value: `${inputs.tabs}`, icon: "🗂️" },
+    { label: "Deadline", value: `${inputs.hoursToDeadline}h`, icon: "⏰" },
+    { label: "Grass", value: `${inputs.hoursSinceGrass}h`, icon: "🌿" },
+  ];
 
   return (
     <div
@@ -79,7 +89,7 @@ export default function ExportCard({
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: "16px",
+          gap: "12px",
         }}
       >
         {username && (
@@ -122,14 +132,58 @@ export default function ExportCard({
             {tier.label}
           </span>
         </div>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "16px",
+            marginTop: "12px",
+            justifyContent: "center",
+            flexWrap: "wrap" as const,
+          }}
+        >
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "2px",
+              }}
+            >
+              <span style={{ fontSize: "18px" }}>{stat.icon}</span>
+              <span
+                style={{
+                  color: "#e4e4e7",
+                  fontSize: "16px",
+                  fontWeight: 700,
+                }}
+              >
+                {stat.value}
+              </span>
+              <span
+                style={{
+                  color: "#71717a",
+                  fontSize: "10px",
+                  textTransform: "uppercase" as const,
+                  letterSpacing: "0.05em",
+                }}
+              >
+                {stat.label}
+              </span>
+            </div>
+          ))}
+        </div>
+
         {readout && (
           <p
             style={{
               color: "#a1a1aa",
-              fontSize: "14px",
+              fontSize: "13px",
               textAlign: "center" as const,
               lineHeight: 1.6,
-              maxWidth: "400px",
+              maxWidth: "420px",
               marginTop: "8px",
             }}
           >

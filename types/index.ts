@@ -4,7 +4,6 @@ export interface FormInputs {
   tabs: number;
   hoursToDeadline: number;
   hoursSinceGrass: number;
-  vibeCheck: 1 | 2 | 3 | 4 | 5;
 }
 
 export interface Tier {

@@ -11,9 +11,8 @@ import StepCaffeine from "./StepCaffeine";
 import StepTabs from "./StepTabs";
 import StepDeadline from "./StepDeadline";
 import StepGrass from "./StepGrass";
-import StepVibe from "./StepVibe";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 5;
 
 export default function SingeForm() {
   const router = useRouter();
@@ -24,7 +23,6 @@ export default function SingeForm() {
     tabs: 10,
     hoursToDeadline: 12,
     hoursSinceGrass: 4,
-    vibeCheck: 3,
   });
 
   const nextStep = useCallback(() => {
@@ -40,7 +38,7 @@ export default function SingeForm() {
   }, []);
 
   const handleSubmit = useCallback(() => {
-    posthog.capture("form_step_completed", { step: 6 });
+    posthog.capture("form_step_completed", { step: 5 });
     const score = calculateSingeScore(inputs);
     const tier = getTier(score);
 
@@ -52,7 +50,6 @@ export default function SingeForm() {
       tabs: inputs.tabs.toString(),
       hoursToDeadline: inputs.hoursToDeadline.toString(),
       hoursSinceGrass: inputs.hoursSinceGrass.toString(),
-      vibeCheck: inputs.vibeCheck.toString(),
     });
 
     router.push(`/result?${params.toString()}`);
@@ -105,14 +102,6 @@ export default function SingeForm() {
           <StepGrass
             value={inputs.hoursSinceGrass}
             onChange={(v) => setInputs({ ...inputs, hoursSinceGrass: v })}
-            onNext={nextStep}
-            onBack={prevStep}
-          />
-        )}
-        {step === 5 && (
-          <StepVibe
-            value={inputs.vibeCheck}
-            onChange={(v) => setInputs({ ...inputs, vibeCheck: v })}
             onSubmit={handleSubmit}
             onBack={prevStep}
           />

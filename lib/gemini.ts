@@ -14,7 +14,6 @@ Their inputs:
 - Browser tabs open: ${inputs.tabs}
 - Hours until their deadline: ${inputs.hoursToDeadline}
 - Hours since they last went outside: ${inputs.hoursSinceGrass}
-- Self-reported vibe (1 = dying, 5 = thriving): ${inputs.vibeCheck}
 
 Their Singe Score: ${score}/100
 Their tier: ${tier.label}
