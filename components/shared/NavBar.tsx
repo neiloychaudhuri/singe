@@ -34,8 +34,6 @@ export default function NavBar() {
         className="text-zinc-400 text-sm font-medium hover:underline underline-offset-4 decoration-yellow-400 transition-all shrink-0"
       >
         <span className="text-zinc-100 font-bold">singe</span>
-        <span className="text-zinc-600 hidden sm:inline"> — </span>
-        <span className="hidden sm:inline">made by neiloy chaudhuri</span>
       </Link>
 
       <div className="flex items-center gap-3 sm:gap-4">
@@ -73,8 +71,7 @@ export default function NavBar() {
           href="/leaderboard"
           className="text-zinc-600 hover:text-zinc-300 text-sm transition-colors"
         >
-          <span className="sm:hidden">lb</span>
-          <span className="hidden sm:inline">leaderboard</span>
+          leaderboard
         </Link>
       </div>
     </nav>

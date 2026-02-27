@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] py-12 overflow-visible">
       <div className="text-center mb-12 overflow-visible">
-        <div className="relative w-[100vw] h-[45vh] md:h-[55vh] mb-6 overflow-visible">
+        <div className="relative w-[100vw] h-[45vh] md:h-[55vh] mb-2 overflow-visible">
           <ASCIIText
             text="Singe"
             enableWaves
@@ -21,6 +21,9 @@ export default function Home() {
             planeBaseHeight={14}
           />
         </div>
+        <p className="text-zinc-600 text-xs mb-6 tracking-wide">
+          made by neiloy chaudhuri
+        </p>
         <p className="text-zinc-500 text-base max-w-lg mx-auto leading-relaxed">
           <span className="syntax-comment">// answer </span>
           <span className="syntax-number">6</span>
