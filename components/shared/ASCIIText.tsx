@@ -413,6 +413,18 @@ class CanvAscii {
     this.width = w;
     this.height = h;
     this.camera.aspect = w / h;
+
+    if (this.geometry) {
+      const planeW = this.geometry.parameters.width;
+      const planeH = this.geometry.parameters.height;
+      const fovRad = (this.camera.fov * Math.PI) / 180;
+      const halfTan = Math.tan(fovRad / 2);
+      const margin = 1.15;
+      const zForHeight = (planeH * margin) / (2 * halfTan);
+      const zForWidth = (planeW * margin) / (2 * halfTan * (w / h));
+      this.camera.position.z = Math.max(zForWidth, zForHeight, 15);
+    }
+
     this.camera.updateProjectionMatrix();
     this.filter.setSize(w, h);
     this.center = { x: w / 2, y: h / 2 };
