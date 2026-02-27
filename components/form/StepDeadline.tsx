@@ -44,7 +44,7 @@ export default function StepDeadline({
         />
         <div className="mt-4 text-center">
           <span className="text-5xl font-black text-zinc-100 tabular-nums">
-            {local}
+            {local >= 48 ? "48+" : local}
           </span>
           <span className="text-xl text-zinc-400 ml-2">hours</span>
         </div>

@@ -36,7 +36,7 @@ export default function ExportCard({
     { label: "Sleep", value: `${inputs.sleepHours}h`, icon: "🛏️" },
     { label: "Coffees", value: `${inputs.coffees}`, icon: "☕" },
     { label: "Tabs", value: `${inputs.tabs}`, icon: "🗂️" },
-    { label: "Deadline", value: `${inputs.hoursToDeadline}h`, icon: "⏰" },
+    { label: "Deadline", value: inputs.hoursToDeadline >= 48 ? "48+h" : `${inputs.hoursToDeadline}h`, icon: "⏰" },
     { label: "Grass", value: `${inputs.hoursSinceGrass}h`, icon: "🌿" },
   ];
 
