@@ -156,7 +156,7 @@ function ResultContent() {
         </div>
       )}
 
-      <ShareButton />
+      <ShareButton score={score} tierLabel={tier.label} />
 
       <Link
         href="/leaderboard"
