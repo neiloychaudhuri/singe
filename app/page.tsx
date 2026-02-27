@@ -14,7 +14,7 @@ export default function Home() {
       <div className="text-center mb-12">
         <div className="relative w-[90vw] h-[30vh] md:h-[40vh] mb-6">
           <ASCIIText
-            text="Singe"
+            text="Singe."
             enableWaves
             asciiFontSize={6}
             textFontSize={500}
