@@ -13,6 +13,7 @@ import AIReadout from "@/components/result/AIReadout";
 import StreakWidget from "@/components/result/StreakWidget";
 import ExportCard from "@/components/result/ExportCard";
 import ShareButton from "@/components/shared/ShareButton";
+import SchoolSearch from "@/components/shared/SchoolSearch";
 import Link from "next/link";
 
 function ResultContent() {
@@ -23,8 +24,10 @@ function ResultContent() {
   const [readout, setReadout] = useState<string | null>(null);
   const [loadingReadout, setLoadingReadout] = useState(true);
   const [username, setUsername] = useState("");
+  const [school, setSchool] = useState("");
   const [leaderboardSubmitted, setLeaderboardSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const score = parseInt(searchParams.get("score") || "0");
   const tier: Tier = getTier(score);
@@ -80,8 +83,9 @@ function ResultContent() {
   const handleLeaderboardSubmit = async () => {
     if (!deviceId || leaderboardSubmitted) return;
     setSubmitting(true);
+    setSubmitError(null);
     try {
-      await fetch("/api/leaderboard/submit", {
+      const res = await fetch("/api/leaderboard/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -89,11 +93,18 @@ function ResultContent() {
           score,
           tier: tier.label,
           username: username.trim() || null,
+          school: school || null,
         }),
       });
+      if (res.status === 429) {
+        const data = await res.json();
+        setSubmitError(data.error || "Already submitted today.");
+        return;
+      }
       setLeaderboardSubmitted(true);
     } catch (err) {
       console.error("Failed to submit to leaderboard:", err);
+      setSubmitError("Something went wrong. Try again.");
     } finally {
       setSubmitting(false);
     }
@@ -139,9 +150,13 @@ function ResultContent() {
             maxLength={20}
             className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:border-yellow-400 transition-colors"
           />
-          <p className="text-zinc-600 text-xs text-center">
-            Leave blank to stay anonymous
+          <SchoolSearch value={school} onChange={setSchool} />
+          <p className="text-zinc-600 text-xs text-center -mt-1">
+            Be honest — 1 submission/day, resets at 1pm EST
           </p>
+          {submitError && (
+            <p className="text-red-400 text-xs text-center">{submitError}</p>
+          )}
           <button
             onClick={handleLeaderboardSubmit}
             disabled={submitting || !deviceId}

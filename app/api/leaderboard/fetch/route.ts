@@ -7,7 +7,7 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from("leaderboard")
-      .select("device_id, score, tier, username, created_at")
+      .select("device_id, score, tier, username, school, created_at")
       .order("score", { ascending: false })
       .limit(200);
 
@@ -21,7 +21,7 @@ export async function GET() {
 
     const bestByDevice = new Map<
       string,
-      { device_id: string; score: number; tier: string; username: string | null; created_at: string }
+      { device_id: string; score: number; tier: string; username: string | null; school: string | null; created_at: string }
     >();
 
     for (const row of data || []) {

@@ -23,13 +23,22 @@ export default function ShareButton({ score, tierLabel }: Props) {
   const shareText = `I scored ${score}/100 on Singe — ${tierLabel}. How cooked are you?`;
   const siteUrl = "https://getsinged.vercel.app";
 
-  const handleDownload = async () => {
+  const handleSave = async () => {
     setBusy("download");
     try {
-      await downloadCard(elementId, `singe-${format}`);
-      posthog.capture("card_exported", { format, method: "download" });
+      const blob = await renderCardToBlob(elementId);
+      if (!blob) throw new Error("No blob");
+      const file = new File([blob], `singe-${format}.png`, { type: "image/png" });
+      // On mobile, use Web Share API → user can tap "Save Image" to Photos
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: "My Singe Score" });
+        posthog.capture("card_exported", { format, method: "save_to_photos" });
+      } else {
+        await downloadCard(elementId, `singe-${format}`);
+        posthog.capture("card_exported", { format, method: "download" });
+      }
     } catch (err) {
-      console.error("Download failed:", err);
+      console.error("Save failed:", err);
     } finally {
       setBusy(null);
     }
@@ -141,7 +150,7 @@ export default function ShareButton({ score, tierLabel }: Props) {
 
       <div className="grid grid-cols-2 gap-2 w-full">
         <button
-          onClick={handleDownload}
+          onClick={handleSave}
           disabled={!!busy}
           className="flex items-center justify-center gap-2 px-4 py-3 bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 text-black font-bold rounded-lg transition-colors text-sm"
         >

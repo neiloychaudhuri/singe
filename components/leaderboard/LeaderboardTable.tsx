@@ -70,14 +70,21 @@ export default function LeaderboardTable({
               >
                 {entry.score}
               </span>
-              <span className="text-zinc-400 text-sm flex-1 truncate">
-                {displayName}
-                {isCurrentUser && (
-                  <span className="text-yellow-400 ml-2 font-bold">
-                    (you)
+              <div className="flex flex-col flex-1 min-w-0">
+                <span className="text-zinc-400 text-sm truncate">
+                  {displayName}
+                  {isCurrentUser && (
+                    <span className="text-yellow-400 ml-2 font-bold">
+                      (you)
+                    </span>
+                  )}
+                </span>
+                {entry.school && (
+                  <span className="text-zinc-600 text-xs truncate">
+                    {entry.school}
                   </span>
                 )}
-              </span>
+              </div>
               <span className="text-zinc-600 text-sm">
                 {relativeTime(entry.created_at)}
               </span>

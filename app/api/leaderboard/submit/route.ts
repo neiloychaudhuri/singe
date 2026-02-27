@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { device_id, score, tier, username } = await req.json();
+    const { device_id, score, tier, username, school } = await req.json();
 
     if (!device_id || score === undefined || !tier) {
       return NextResponse.json(
@@ -16,15 +16,43 @@ export async function POST(req: Request) {
       ? username.trim().slice(0, 20).replace(/[^a-zA-Z0-9_.-]/g, "")
       : null;
 
+    const sanitizedSchool =
+      typeof school === "string" && school.trim().length > 0
+        ? school.trim().slice(0, 60)
+        : null;
+
     const supabase = getSupabaseServerClient();
-    const { error } = await supabase
+
+    // One submission per device per day — resets at 1pm UTC daily
+    const now = new Date();
+    const resetHourUTC = 13; // 1pm UTC
+    const todayReset = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), resetHourUTC));
+    const windowStart = now.getUTCHours() >= resetHourUTC
+      ? todayReset
+      : new Date(todayReset.getTime() - 24 * 60 * 60 * 1000);
+
+    const { data: recent } = await supabase
       .from("leaderboard")
-      .insert({
-        device_id,
-        score,
-        tier,
-        username: sanitizedUsername || null,
-      });
+      .select("created_at")
+      .eq("device_id", device_id)
+      .gte("created_at", windowStart.toISOString())
+      .limit(1)
+      .maybeSingle();
+
+    if (recent) {
+      return NextResponse.json(
+        { error: "Already submitted today. Resets at 1pm UTC." },
+        { status: 429 }
+      );
+    }
+
+    const { error } = await supabase.from("leaderboard").insert({
+      device_id,
+      score,
+      tier,
+      username: sanitizedUsername || null,
+      school: sanitizedSchool || null,
+    });
 
     if (error) {
       console.error("Supabase insert error:", error);

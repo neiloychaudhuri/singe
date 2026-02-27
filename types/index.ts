@@ -29,6 +29,7 @@ export interface LeaderboardEntry {
   tier: string;
   created_at: string;
   username?: string;
+  school?: string;
 }
 
 export interface StreakEntry {
