@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import NavBar from "@/components/shared/NavBar";
 import PostHogInit from "@/components/shared/PostHogInit";
+import ParticlesBackground from "@/components/shared/ParticlesBackground";
 
 export const metadata: Metadata = {
   title: "Singe — How Cooked Are You?",
@@ -23,9 +24,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+        <ParticlesBackground />
         <PostHogInit />
         <NavBar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 relative z-0">{children}</main>
       </body>
     </html>
   );
