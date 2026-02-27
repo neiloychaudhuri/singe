@@ -1,35 +1,53 @@
 "use client";
 
 import { useState } from "react";
-import {
-  downloadCard,
-  copyCardToClipboard,
-  shareCard,
-  renderCardToBlob,
-} from "@/lib/exportCard";
+import { downloadCard, renderCardToBlob } from "@/lib/exportCard";
 import { posthog } from "@/lib/posthog";
+import { FormInputs } from "@/types";
 
 interface Props {
   score: number;
   tierLabel: string;
+  inputs?: FormInputs;
 }
 
-export default function ShareButton({ score, tierLabel }: Props) {
+export default function ShareButton({ score, tierLabel, inputs }: Props) {
   const [format, setFormat] = useState<"square" | "story">("square");
   const [busy, setBusy] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const elementId = `export-card-${format}`;
-  const shareText = `I scored ${score}/100 on Singe — ${tierLabel}. How cooked are you?`;
   const siteUrl = "https://getsinged.vercel.app";
+  const shareText = `I scored ${score}/100 on Singe — ${tierLabel}. How cooked are you?`;
+
+  // Emoji text fallback used when the image card can't be rendered
+  const statsFallbackText = inputs
+    ? [
+        `😴 ${inputs.sleepHours === 12 ? "12+" : inputs.sleepHours}h sleep`,
+        `☕ ${inputs.coffees} coffee${inputs.coffees !== 1 ? "s" : ""}`,
+        `💻 ${inputs.tabs} tabs`,
+        `⏰ ${inputs.hoursToDeadline}h to deadline`,
+        `🌿 ${inputs.hoursSinceGrass}h no grass`,
+      ].join(" • ") +
+      `\n🔥 ${score}/100 — ${tierLabel}. How cooked are you?\n${siteUrl}`
+    : `${shareText}\n${siteUrl}`;
+
+  /** Renders the card blob and creates a shareable File, or returns null on failure */
+  async function getCardFile(): Promise<File | null> {
+    try {
+      const blob = await renderCardToBlob(elementId);
+      if (!blob) return null;
+      return new File([blob], "singe-score.png", { type: "image/png" });
+    } catch {
+      return null;
+    }
+  }
 
   const handleSave = async () => {
     setBusy("download");
     try {
-      const blob = await renderCardToBlob(elementId);
-      if (!blob) throw new Error("No blob");
-      const file = new File([blob], `singe-${format}.png`, { type: "image/png" });
-      // On mobile, use Web Share API → user can tap "Save Image" to Photos
+      const file = await getCardFile();
+      if (!file) throw new Error("No card");
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: "My Singe Score" });
         posthog.capture("card_exported", { format, method: "save_to_photos" });
@@ -46,12 +64,28 @@ export default function ShareButton({ score, tierLabel }: Props) {
 
   const handleCopy = async () => {
     setBusy("copy");
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     try {
-      const ok = await copyCardToClipboard(elementId);
-      if (ok) {
+      const file = await getCardFile();
+      if (!file) throw new Error("No card");
+
+      // Try native clipboard first (Safari 16.4+, desktop Chrome)
+      let clipboardOk = false;
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": file })]);
+        clipboardOk = true;
+      } catch {
+        // Clipboard API unavailable (e.g. Chrome/Firefox on iOS)
+      }
+
+      if (clipboardOk) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
         posthog.capture("card_exported", { format, method: "copy" });
+      } else if (isMobile && navigator.share && navigator.canShare?.({ files: [file] })) {
+        // Fallback: share sheet — user can long-press → Copy Image
+        await navigator.share({ files: [file] });
+        posthog.capture("card_exported", { format, method: "copy_share_fallback" });
       }
     } catch (err) {
       console.error("Copy failed:", err);
@@ -62,70 +96,70 @@ export default function ShareButton({ score, tierLabel }: Props) {
 
   const handleTweet = async () => {
     setBusy("tweet");
-    const tweetText = `${shareText}\n\n${siteUrl}`;
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const twitterWebUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(statsFallbackText)}`;
 
     try {
-      // Download the card first so users have it to attach
-      const blob = await renderCardToBlob(elementId);
-      if (blob) {
-        await downloadCard(elementId, `singe-${format}`);
+      const file = await getCardFile();
+
+      if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
+        // Share sheet with image pre-loaded — user picks Twitter and image is ready to send
+        await navigator.share({ files: [file], text: `${shareText}\n\n${siteUrl}` });
+        posthog.capture("card_exported", { format, method: "tweet_share_image" });
+        return;
       }
-      posthog.capture("card_exported", { format, method: isMobile ? "tweet_mobile" : "tweet" });
+
+      // Fallback: open Twitter web intent with emoji stats (no download)
+      posthog.capture("card_exported", { format, method: "tweet_text_fallback" });
+      window.open(twitterWebUrl, "_blank", "noopener,noreferrer");
     } catch (err) {
-      console.error("Tweet card export failed:", err);
+      // User cancelled → don't open Twitter
+      if ((err as Error)?.name !== "AbortError") {
+        window.open(twitterWebUrl, "_blank", "noopener,noreferrer");
+      }
+      console.error("Tweet share failed:", err);
     } finally {
       setBusy(null);
-    }
-
-    const twitterWebUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-
-    if (isMobile) {
-      // Try to open the Twitter app; fall back to browser after 1.5 s if app isn't installed
-      const twitterAppUrl = `twitter://post?message=${encodeURIComponent(tweetText)}`;
-
-      const fallbackTimer = setTimeout(() => {
-        window.open(twitterWebUrl, "_blank", "noopener,noreferrer");
-      }, 1500);
-
-      // If the browser goes to background the app opened — cancel the web fallback
-      document.addEventListener(
-        "visibilitychange",
-        () => {
-          if (document.hidden) clearTimeout(fallbackTimer);
-        },
-        { once: true }
-      );
-
-      window.location.href = twitterAppUrl;
-    } else {
-      window.open(twitterWebUrl, "_blank", "noopener,noreferrer");
     }
   };
 
   const handleSMS = async () => {
     setBusy("sms");
     try {
-      await downloadCard(elementId, `singe-${format}`);
-      posthog.capture("card_exported", { format, method: "sms" });
+      const file = await getCardFile();
+
+      if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
+        // Share sheet with image — works for iMessage, WhatsApp, etc.
+        await navigator.share({ files: [file], text: `${shareText} ${siteUrl}` });
+        posthog.capture("card_exported", { format, method: "sms_share_image" });
+        return;
+      }
+
+      // Fallback: SMS deep link with emoji stats text (no download)
+      posthog.capture("card_exported", { format, method: "sms_text_fallback" });
+      window.open(`sms:?&body=${encodeURIComponent(statsFallbackText)}`, "_self");
     } catch (err) {
-      console.error("Download for SMS failed:", err);
+      console.error("SMS share failed:", err);
+      window.open(`sms:?&body=${encodeURIComponent(statsFallbackText)}`, "_self");
     } finally {
       setBusy(null);
     }
-    const body = encodeURIComponent(`${shareText} ${siteUrl}`);
-    window.open(`sms:?&body=${body}`, "_self");
   };
 
   const handleNativeShare = async () => {
     setBusy("share");
     try {
-      const ok = await shareCard(elementId, `${shareText}\n${siteUrl}`);
-      if (ok) {
+      const file = await getCardFile();
+
+      if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], text: `${shareText}\n${siteUrl}` });
         posthog.capture("card_exported", { format, method: "native_share" });
-      } else {
-        await downloadCard(elementId, `singe-${format}`);
-        posthog.capture("card_exported", { format, method: "download_fallback" });
+        return;
+      }
+
+      // Fallback: text-only share (no download)
+      if (navigator.share) {
+        await navigator.share({ text: statsFallbackText });
+        posthog.capture("card_exported", { format, method: "native_share_text" });
       }
     } catch (err) {
       console.error("Share failed:", err);
