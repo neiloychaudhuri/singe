@@ -26,7 +26,7 @@ export default function Home() {
         </p>
         <p className="text-zinc-500 text-base max-w-lg mx-auto leading-relaxed">
           <span className="syntax-comment">// answer </span>
-          <span className="syntax-number">6</span>
+          <span className="syntax-number">5</span>
           <span className="syntax-comment"> quick questions</span>
           <br />
           <span className="syntax-keyword">const</span>{" "}
