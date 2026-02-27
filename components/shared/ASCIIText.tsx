@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 
 const vertexShader = `
@@ -515,6 +515,7 @@ export default function ASCIIText({
 }: ASCIITextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const asciiRef = useRef<CanvAscii | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -570,6 +571,7 @@ export default function ASCIIText({
                 );
                 if (!cancelled && asciiRef.current) {
                   asciiRef.current.load();
+                  setLoaded(true);
                 }
               }
             }
@@ -587,6 +589,7 @@ export default function ASCIIText({
       );
       if (!cancelled && asciiRef.current) {
         asciiRef.current.load();
+        setLoaded(true);
 
         ro = new ResizeObserver((entries) => {
           if (!entries[0] || !asciiRef.current) return;
@@ -628,6 +631,8 @@ export default function ASCIIText({
         width: "100%",
         height: "100%",
         overflow: "visible",
+        opacity: loaded ? 1 : 0,
+        transition: "opacity 0.8s ease-in-out",
       }}
     >
       <style>{`
