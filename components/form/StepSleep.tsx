@@ -40,7 +40,7 @@ export default function StepSleep({ value, onChange, onNext }: Props) {
         />
         <div className="mt-4 text-center">
           <span className="text-5xl font-black text-zinc-100 tabular-nums">
-            {local}
+            {local === 12 ? "12+" : local}
           </span>
           <span className="text-xl text-zinc-400 ml-2">hours</span>
         </div>

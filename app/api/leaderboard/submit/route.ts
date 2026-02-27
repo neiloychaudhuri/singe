@@ -23,9 +23,9 @@ export async function POST(req: Request) {
 
     const supabase = getSupabaseServerClient();
 
-    // One submission per device per day — resets at 1pm UTC daily
+    // One submission per device per day — resets at 1pm EST (UTC-5) daily
     const now = new Date();
-    const resetHourUTC = 13; // 1pm UTC
+    const resetHourUTC = 18; // 1pm EST = 18:00 UTC
     const todayReset = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), resetHourUTC));
     const windowStart = now.getUTCHours() >= resetHourUTC
       ? todayReset
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     if (recent) {
       return NextResponse.json(
-        { error: "Already submitted today. Resets at 1pm UTC." },
+        { error: "Already submitted today. Resets at 1pm EST." },
         { status: 429 }
       );
     }

@@ -62,31 +62,45 @@ export default function ShareButton({ score, tierLabel }: Props) {
 
   const handleTweet = async () => {
     setBusy("tweet");
+    const tweetText = `${shareText}\n\n${siteUrl}`;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     try {
+      // Download the card first so users have it to attach
       const blob = await renderCardToBlob(elementId);
       if (blob) {
-        const file = new File([blob], "singe-score.png", { type: "image/png" });
-        const tweetText = `${shareText}\n\n${siteUrl}`;
-
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ text: tweetText, files: [file] });
-          posthog.capture("card_exported", { format, method: "tweet_share" });
-          setBusy(null);
-          return;
-        }
-
         await downloadCard(elementId, `singe-${format}`);
       }
-      posthog.capture("card_exported", { format, method: "tweet" });
+      posthog.capture("card_exported", { format, method: isMobile ? "tweet_mobile" : "tweet" });
     } catch (err) {
-      console.error("Tweet share failed:", err);
+      console.error("Tweet card export failed:", err);
     } finally {
       setBusy(null);
     }
-    const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(
-      `${shareText}\n\n${siteUrl}`
-    )}`;
-    window.open(tweetUrl, "_blank", "noopener,noreferrer");
+
+    const twitterWebUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+
+    if (isMobile) {
+      // Try to open the Twitter app; fall back to browser after 1.5 s if app isn't installed
+      const twitterAppUrl = `twitter://post?message=${encodeURIComponent(tweetText)}`;
+
+      const fallbackTimer = setTimeout(() => {
+        window.open(twitterWebUrl, "_blank", "noopener,noreferrer");
+      }, 1500);
+
+      // If the browser goes to background the app opened — cancel the web fallback
+      document.addEventListener(
+        "visibilitychange",
+        () => {
+          if (document.hidden) clearTimeout(fallbackTimer);
+        },
+        { once: true }
+      );
+
+      window.location.href = twitterAppUrl;
+    } else {
+      window.open(twitterWebUrl, "_blank", "noopener,noreferrer");
+    }
   };
 
   const handleSMS = async () => {
