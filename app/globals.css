@@ -3,6 +3,9 @@
 :root {
   --background: #09090b;
   --foreground: #fafafa;
+  --accent: #FFD54F;
+  --accent-hover: #FFECB3;
+  --accent-rgb: 255, 213, 79;
 }
 
 body {
@@ -19,20 +22,20 @@ input[type="range"]::-webkit-slider-thumb {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #f97316;
+  background: var(--accent);
   cursor: pointer;
   border: 2px solid #09090b;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
 }
 
 input[type="range"]::-moz-range-thumb {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #f97316;
+  background: var(--accent);
   cursor: pointer;
   border: 2px solid #09090b;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
 }
 
 @keyframes fadeInUp {

@@ -56,7 +56,7 @@ export default function LeaderboardTable({
               key={`${entry.rank}-${entry.device_id}`}
               className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                 isCurrentUser
-                  ? "bg-orange-500/10 border border-orange-500/30"
+                  ? "bg-yellow-400/10 border border-yellow-400/30"
                   : "bg-zinc-900 border border-zinc-800/50"
               }`}
             >
@@ -73,7 +73,7 @@ export default function LeaderboardTable({
               <span className="text-zinc-400 text-sm flex-1 truncate">
                 {displayName}
                 {isCurrentUser && (
-                  <span className="text-orange-400 ml-2 font-bold">
+                  <span className="text-yellow-400 ml-2 font-bold">
                     (you)
                   </span>
                 )}

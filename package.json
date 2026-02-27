@@ -16,6 +16,7 @@
     "posthog-js": "^1.356.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "three": "^0.183.1",
     "uuid": "^13.0.0"
   },
   "engines": {
@@ -26,6 +27,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.183.1",
     "@types/uuid": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "^15.5.12",

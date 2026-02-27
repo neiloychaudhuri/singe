@@ -33,7 +33,7 @@ export default function StepVibe({
             onClick={() => onChange(v.value)}
             className={`flex flex-col items-center gap-1 px-5 py-4 rounded-xl transition-all ${
               value === v.value
-                ? "bg-orange-500 text-zinc-950 scale-110"
+                ? "bg-yellow-400 text-black scale-110"
                 : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
             }`}
           >
@@ -51,7 +51,7 @@ export default function StepVibe({
         </button>
         <button
           onClick={onSubmit}
-          className="px-8 py-3 bg-orange-500 hover:bg-orange-400 text-zinc-950 font-bold rounded-lg transition-colors text-lg"
+          className="px-8 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-lg transition-colors text-lg"
         >
           Get Singed
         </button>

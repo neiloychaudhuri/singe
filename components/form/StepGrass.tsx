@@ -29,7 +29,7 @@ export default function StepGrass({ value, onChange, onNext, onBack }: Props) {
             setLocal(v);
             onChange(v);
           }}
-          className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
+          className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-yellow-400"
         />
         <div className="mt-4 text-center">
           <span className="text-5xl font-black text-zinc-100 tabular-nums">
@@ -47,7 +47,7 @@ export default function StepGrass({ value, onChange, onNext, onBack }: Props) {
         </button>
         <button
           onClick={onNext}
-          className="px-8 py-3 bg-orange-500 hover:bg-orange-400 text-zinc-950 font-bold rounded-lg transition-colors text-lg"
+          className="px-8 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-lg transition-colors text-lg"
         >
           Next
         </button>

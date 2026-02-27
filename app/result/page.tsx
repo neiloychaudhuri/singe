@@ -139,7 +139,7 @@ function ResultContent() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             maxLength={20}
-            className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:border-orange-500 transition-colors"
+            className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:border-yellow-400 transition-colors"
           />
           <p className="text-zinc-600 text-xs text-center">
             Leave blank to stay anonymous
@@ -153,7 +153,7 @@ function ResultContent() {
           </button>
         </div>
       ) : (
-        <div className="bg-zinc-900 border border-orange-500/30 rounded-xl px-5 py-3 text-sm text-orange-400 font-medium">
+        <div className="bg-zinc-900 border border-yellow-400/30 rounded-xl px-5 py-3 text-sm text-yellow-400 font-medium">
           Score submitted to leaderboard!
         </div>
       )}

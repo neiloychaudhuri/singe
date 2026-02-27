@@ -51,7 +51,7 @@ export default function ShareButton({ disabled }: Props) {
       <button
         onClick={handleExport}
         disabled={disabled || exporting}
-        className="px-8 py-3 bg-orange-500 hover:bg-orange-400 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-bold rounded-lg transition-colors text-lg"
+        className="px-8 py-3 bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold rounded-lg transition-colors text-lg"
       >
         {exporting ? "Exporting..." : "Export Card"}
       </button>

@@ -52,7 +52,7 @@ export default function AIReadout({ text, loading }: Props) {
     <p className="text-zinc-300 text-lg leading-relaxed max-w-lg text-center">
       {displayed}
       {!done && (
-        <span className="inline-block w-0.5 h-5 bg-orange-500 ml-0.5 animate-pulse align-text-bottom" />
+        <span className="inline-block w-0.5 h-5 bg-yellow-400 ml-0.5 animate-pulse align-text-bottom" />
       )}
     </p>
   );

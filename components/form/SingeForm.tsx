@@ -64,7 +64,7 @@ export default function SingeForm() {
     <div className="w-full max-w-lg mx-auto">
       <div className="w-full h-1 bg-zinc-800 rounded-full mb-10 overflow-hidden">
         <div
-          className="h-full bg-orange-500 transition-all duration-300 ease-out rounded-full"
+          className="h-full bg-yellow-400 transition-all duration-300 ease-out rounded-full"
           style={{ width: `${progressPct}%` }}
         />
       </div>
