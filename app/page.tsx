@@ -10,9 +10,9 @@ const ASCIIText = dynamic(
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] px-4 py-12">
-      <div className="text-center mb-12">
-        <div className="relative w-[90vw] h-[30vh] md:h-[40vh] mb-6">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] py-12 overflow-visible">
+      <div className="text-center mb-12 overflow-visible">
+        <div className="relative w-[100vw] h-[40vh] md:h-[50vh] mb-6 overflow-visible">
           <ASCIIText
             text="Singe."
             enableWaves
