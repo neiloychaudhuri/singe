@@ -13,7 +13,7 @@ export default function Home() {
       <div className="text-center mb-12 overflow-visible">
         <div className="relative w-[100vw] h-[45vh] md:h-[55vh] mb-2 overflow-visible">
           <ASCIIText
-            text="Singe "
+            text=" Singe "
             enableWaves
             asciiFontSize={6}
             textFontSize={420}
