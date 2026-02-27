@@ -12,14 +12,14 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] px-4 py-12">
       <div className="text-center mb-12">
-        <div className="relative w-full h-[140px] md:h-[180px] mb-6">
+        <div className="relative w-full h-[250px] md:h-[350px] mb-6">
           <ASCIIText
-            text="Singe"
+            text="Get Singed"
             enableWaves
-            asciiFontSize={3}
-            textFontSize={200}
+            asciiFontSize={5}
+            textFontSize={300}
             textColor="#FFD54F"
-            planeBaseHeight={8}
+            planeBaseHeight={12}
           />
         </div>
         <p className="text-zinc-500 text-lg max-w-md mx-auto">
