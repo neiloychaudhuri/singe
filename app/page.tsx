@@ -3,10 +3,9 @@
 import SingeForm from "@/components/form/SingeForm";
 import dynamic from "next/dynamic";
 
-const ASCIIText = dynamic(
-  () => import("@/components/shared/ASCIIText"),
-  { ssr: false }
-);
+const ASCIIText = dynamic(() => import("@/components/shared/ASCIIText"), {
+  ssr: false,
+});
 
 export default function Home() {
   return (
@@ -14,7 +13,7 @@ export default function Home() {
       <div className="text-center mb-12 overflow-visible">
         <div className="relative w-[100vw] h-[45vh] md:h-[55vh] mb-6 overflow-visible">
           <ASCIIText
-            text="Singe."
+            text="Singe"
             enableWaves
             asciiFontSize={6}
             textFontSize={420}
@@ -35,7 +34,9 @@ export default function Home() {
           <span className="syntax-string">&quot;your_life&quot;</span>
           <span className="text-zinc-400">);</span>
           <br />
-          <span className="syntax-comment">// brutally honest score + AI roast + hype</span>
+          <span className="syntax-comment">
+            // brutally honest score + AI roast + hype
+          </span>
         </p>
       </div>
       <SingeForm />
