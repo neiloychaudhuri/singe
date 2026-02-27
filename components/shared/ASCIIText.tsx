@@ -87,6 +87,7 @@ class AsciiFilter {
     this.domElement.style.left = "0";
     this.domElement.style.width = "100%";
     this.domElement.style.height = "100%";
+    this.domElement.style.overflow = "visible";
 
     this.pre = document.createElement("pre");
     this.domElement.appendChild(this.pre);
