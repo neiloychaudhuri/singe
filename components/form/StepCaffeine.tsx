@@ -17,14 +17,17 @@ export default function StepCaffeine({
 }: Props) {
   return (
     <div className="flex flex-col items-center gap-8">
-      <h2 className="text-2xl font-bold tracking-tight">
-        <span className="syntax-fn">caffeine</span>
-        <span className="text-zinc-400">(</span>
-        <span className="syntax-string">cups</span>
-        <span className="text-zinc-400">)</span>
-        <span className="text-zinc-600"> — </span>
-        <span className="text-zinc-300">today?</span>
-      </h2>
+      <div className="text-center">
+        <h2 className="text-2xl font-bold tracking-tight">
+          <span className="syntax-fn">caffeine</span>
+          <span className="text-zinc-400">(</span>
+          <span className="syntax-string">cups</span>
+          <span className="text-zinc-400">)</span>
+          <span className="text-zinc-600"> — </span>
+          <span className="text-zinc-300">today?</span>
+        </h2>
+        <p className="text-zinc-600 text-sm mt-2">How many coffees have you had today?</p>
+      </div>
       <div className="flex flex-wrap justify-center gap-3 max-w-sm">
         {OPTIONS.map((n) => (
           <button

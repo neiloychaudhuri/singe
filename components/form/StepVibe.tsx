@@ -23,13 +23,16 @@ export default function StepVibe({
 }: Props) {
   return (
     <div className="flex flex-col items-center gap-8">
-      <h2 className="text-2xl font-bold tracking-tight">
-        <span className="syntax-keyword">return</span>{" "}
-        <span className="syntax-fn">vibeCheck</span>
-        <span className="text-zinc-400">(</span>
-        <span className="syntax-string">self</span>
-        <span className="text-zinc-400">);</span>
-      </h2>
+      <div className="text-center">
+        <h2 className="text-2xl font-bold tracking-tight">
+          <span className="syntax-keyword">return</span>{" "}
+          <span className="syntax-fn">vibeCheck</span>
+          <span className="text-zinc-400">(</span>
+          <span className="syntax-string">self</span>
+          <span className="text-zinc-400">);</span>
+        </h2>
+        <p className="text-zinc-600 text-sm mt-2">How are you actually doing right now?</p>
+      </div>
       <div className="flex flex-wrap justify-center gap-3 max-w-md">
         {VIBES.map((v) => (
           <button

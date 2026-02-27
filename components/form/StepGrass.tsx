@@ -14,12 +14,15 @@ export default function StepGrass({ value, onChange, onNext, onBack }: Props) {
 
   return (
     <div className="flex flex-col items-center gap-8">
-      <h2 className="text-2xl font-bold tracking-tight">
-        <span className="syntax-fn">touchGrass</span>
-        <span className="text-zinc-400">(</span>
-        <span className="syntax-string">lastTime</span>
-        <span className="text-zinc-400">)</span>
-      </h2>
+      <div className="text-center">
+        <h2 className="text-2xl font-bold tracking-tight">
+          <span className="syntax-fn">touchGrass</span>
+          <span className="text-zinc-400">(</span>
+          <span className="syntax-string">lastTime</span>
+          <span className="text-zinc-400">)</span>
+        </h2>
+        <p className="text-zinc-600 text-sm mt-2">How long since you last went outside?</p>
+      </div>
       <div className="relative w-full max-w-sm">
         <input
           type="range"

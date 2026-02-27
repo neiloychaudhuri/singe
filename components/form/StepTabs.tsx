@@ -14,14 +14,17 @@ export default function StepTabs({ value, onChange, onNext, onBack }: Props) {
 
   return (
     <div className="flex flex-col items-center gap-8">
-      <h2 className="text-2xl font-bold tracking-tight">
-        <span className="syntax-fn">browser</span>
-        <span className="text-zinc-400">.</span>
-        <span className="syntax-type">tabs</span>
-        <span className="text-zinc-400">.</span>
-        <span className="syntax-fn">count</span>
-        <span className="text-zinc-400">()</span>
-      </h2>
+      <div className="text-center">
+        <h2 className="text-2xl font-bold tracking-tight">
+          <span className="syntax-fn">browser</span>
+          <span className="text-zinc-400">.</span>
+          <span className="syntax-type">tabs</span>
+          <span className="text-zinc-400">.</span>
+          <span className="syntax-fn">count</span>
+          <span className="text-zinc-400">()</span>
+        </h2>
+        <p className="text-zinc-600 text-sm mt-2">How many browser tabs do you have open?</p>
+      </div>
       <div className="relative w-full max-w-sm">
         <input
           type="range"
