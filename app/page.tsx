@@ -38,7 +38,7 @@ export default function Home() {
           <span className="text-zinc-400">);</span>
           <br />
           <span className="syntax-comment">
-            // brutally honest score + AI roast + leaderboard
+            // brutally honest AI-reviewed score + leaderboard
           </span>
         </p>
       </div>
