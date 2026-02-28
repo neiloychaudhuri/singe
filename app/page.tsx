@@ -15,17 +15,21 @@ interface LeaderboardEntry {
   tier: string;
 }
 
+const medals = ["🥇", "🥈", "🥉"];
+
 export default function Home() {
   const [started, setStarted] = useState(false);
-  const [top5, setTop5] = useState<LeaderboardEntry[]>([]);
+  const [top3, setTop3] = useState<LeaderboardEntry[]>([]);
+  const [loadingBoard, setLoadingBoard] = useState(true);
 
   useEffect(() => {
     fetch("/api/leaderboard/fetch")
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) setTop5(data.slice(0, 5));
+        if (Array.isArray(data.entries)) setTop3(data.entries.slice(0, 3));
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoadingBoard(false));
   }, []);
 
   useEffect(() => {
@@ -80,8 +84,52 @@ export default function Home() {
         </p>
       </div>
 
+      {/* Top 3 leaderboard — always reserves space to prevent layout shift */}
+      <div className="w-full max-w-xs mb-5">
+        <p className="text-zinc-600 text-[10px] font-bold tracking-widest uppercase mb-2 text-center">
+          🔥 most cooked of all time
+        </p>
+        <div key={loadingBoard ? "loading" : "loaded"} className={`space-y-0.5 ${!loadingBoard ? "animate-fade-in" : ""}`} style={!loadingBoard ? { animationDuration: "0.6s" } : undefined}>
+          {loadingBoard
+            ? Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-zinc-900/60"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm w-5 text-center">{medals[i]}</span>
+                    <div className="h-3 w-24 bg-zinc-800 rounded animate-pulse" />
+                  </div>
+                  <div className="h-3 w-6 bg-zinc-800 rounded animate-pulse" />
+                </div>
+              ))
+            : top3.map((entry, i) => (
+                <div
+                  key={i}
+                  className={`flex items-center justify-between px-3 py-1.5 rounded-lg ${
+                    i === 0
+                      ? "bg-yellow-400/5 border border-yellow-400/10"
+                      : "bg-zinc-900/60"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-sm w-5 text-center shrink-0">
+                      {medals[i]}
+                    </span>
+                    <span className="text-zinc-300 text-xs truncate">
+                      {entry.username || "unknown singe"}
+                    </span>
+                  </div>
+                  <span className="text-yellow-400 font-bold text-xs font-mono tabular-nums shrink-0 ml-3">
+                    {entry.score}
+                  </span>
+                </div>
+              ))}
+        </div>
+      </div>
+
       {/* CTA */}
-      <div className="flex flex-col items-center gap-3 mb-6">
+      <div className="flex flex-col items-center gap-3">
         <p className="text-zinc-300 text-base font-semibold">
           Let&apos;s find out how cooked you are.
         </p>
@@ -98,38 +146,6 @@ export default function Home() {
         </button>
         <p className="text-zinc-700 text-xs">or press Enter ↵</p>
       </div>
-
-      {/* Top 5 leaderboard preview */}
-      {top5.length > 0 && (
-        <div className="mt-10 w-full max-w-sm">
-          <p className="text-zinc-500 text-xs font-bold tracking-widest uppercase mb-3 text-center">
-            Most Cooked Today
-          </p>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-            {top5.map((entry, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between px-4 py-2.5 border-b border-zinc-800 last:border-0"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-zinc-600 text-xs w-4 text-right font-mono">
-                    {entry.rank}
-                  </span>
-                  <span className="text-zinc-300 text-sm font-medium truncate max-w-[140px]">
-                    {entry.username || "Unknown Singe"}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-zinc-500 text-xs">{entry.tier}</span>
-                  <span className="text-yellow-400 font-bold text-sm font-mono">
-                    {entry.score}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

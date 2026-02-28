@@ -8,11 +8,11 @@ import { Analytics } from "@vercel/analytics/next";
 export const metadata: Metadata = {
   title: "Singe — How Cooked Are You?",
   description:
-    "A brutally honest, AI-powered life assessment tool that tells you exactly how cooked you are — then hypes you up anyway.",
+    "Twin u MIGHT be cooked twin 🥀🫩",
   openGraph: {
     title: "Singe — How Cooked Are You?",
     description:
-      "A brutally honest, AI-powered life assessment tool that tells you exactly how cooked you are — then hypes you up anyway.",
+      "Twin u MIGHT be cooked twin 🥀🫩",
     type: "website",
     images: [{ url: "/singe-thumbnail.png", width: 1200, height: 630 }],
   },
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Singe — How Cooked Are You?",
     description:
-      "A brutally honest, AI-powered life assessment tool that tells you exactly how cooked you are — then hypes you up anyway.",
+      "Twin u MIGHT be cooked twin 🥀🫩",
     images: ["/singe-thumbnail.png"],
   },
 };
