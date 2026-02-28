@@ -3,21 +3,25 @@
 import { useState } from "react";
 import { downloadCard, renderCardToBlob } from "@/lib/exportCard";
 import { posthog } from "@/lib/posthog";
-import { FormInputs } from "@/types";
+import { FormInputs, Tier } from "@/types";
+import ExportCard from "@/components/result/ExportCard";
 
 interface Props {
   score: number;
-  tierLabel: string;
+  tier: Tier;
+  readout: string;
+  streak: number;
   inputs?: FormInputs;
+  username?: string;
 }
 
-export default function ShareButton({ score, tierLabel, inputs }: Props) {
+export default function ShareButton({ score, tier, readout, streak, inputs, username }: Props) {
   const [format, setFormat] = useState<"square" | "story">("square");
   const [busy, setBusy] = useState<string | null>(null);
 
   const elementId = `export-card-${format}`;
   const siteUrl = "https://getsinged.com";
-  const shareText = `I scored ${score}/100 on Singe — ${tierLabel}. How cooked are you?`;
+  const shareText = `I scored ${score}/100 on Singe — ${tier.label}. How cooked are you?`;
 
   // Emoji text fallback used when the image card can't be rendered
   const statsFallbackText = inputs
@@ -28,8 +32,16 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
         `⏰ ${inputs.hoursToDeadline}h to deadline`,
         `🌿 ${inputs.hoursSinceGrass}h no grass`,
       ].join(" • ") +
-      `\n🔥 ${score}/100 — ${tierLabel}. How cooked are you?\n${siteUrl}`
+      `\n🔥 ${score}/100 — ${tier.label}. How cooked are you?\n${siteUrl}`
     : `${shareText}\n${siteUrl}`;
+
+  // Preview scaling
+  const isStory = format === "story";
+  const previewScale = isStory ? 0.25 : 0.444;
+  const cardWidth = 540;
+  const cardHeight = isStory ? 960 : 540;
+  const previewW = Math.round(cardWidth * previewScale);
+  const previewH = Math.round(cardHeight * previewScale);
 
   async function getCardFile(): Promise<File | null> {
     try {
@@ -115,6 +127,7 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
 
   return (
     <div className="flex flex-col items-center gap-4 w-full max-w-sm">
+      {/* Format toggle */}
       <div className="flex gap-2">
         <button
           onClick={() => setFormat("square")}
@@ -138,6 +151,38 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
         </button>
       </div>
 
+      {/* Card preview */}
+      {inputs && (
+        <div
+          className="rounded-xl overflow-hidden"
+          style={{ width: previewW, height: previewH, position: "relative" }}
+        >
+          <div
+            style={{
+              transform: `scale(${previewScale})`,
+              transformOrigin: "top left",
+              pointerEvents: "none",
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
+          >
+            <ExportCard
+              score={score}
+              tier={tier}
+              readout={readout}
+              streak={streak}
+              inputs={inputs}
+              format={format}
+              username={username}
+              id={`export-card-${format}-preview`}
+              isPreview
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Action buttons */}
       <div className="grid grid-cols-3 gap-2 w-full">
         <button
           onClick={handleSave}
