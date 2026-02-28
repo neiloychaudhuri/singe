@@ -4,6 +4,8 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { FormInputs, Tier } from "@/types";
 import { getTier } from "@/lib/tiers";
+import { calculateSingeScore } from "@/lib/scoring";
+import { getLocalDateStr } from "@/lib/streak";
 import { posthog } from "@/lib/posthog";
 import { useStreak } from "@/hooks/useStreak";
 import { useDeviceId } from "@/hooks/useDeviceId";
@@ -29,9 +31,6 @@ function ResultContent() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const score = parseInt(searchParams.get("score") || "0");
-  const tier: Tier = getTier(score);
-
   const inputs: FormInputs = {
     sleepHours: parseFloat(searchParams.get("sleepHours") || "6"),
     coffees: parseInt(searchParams.get("coffees") || "2"),
@@ -40,8 +39,11 @@ function ResultContent() {
     hoursSinceGrass: parseInt(searchParams.get("hoursSinceGrass") || "4"),
   };
 
+  const score = calculateSingeScore(inputs);
+  const tier: Tier = getTier(score);
+
   const saveStreak = useCallback(() => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = getLocalDateStr();
     addEntry({ date: today, score, tier: tier.label });
   }, [score, tier.label, addEntry]);
 
@@ -59,13 +61,14 @@ function ResultContent() {
           body: JSON.stringify({ inputs, score, tier }),
         });
         const data = await res.json();
-        if (data.readout) {
-          setReadout(data.readout);
-          posthog.capture("score_generated", {
-            score,
-            tier: tier.label,
-          });
+        if (!res.ok || !data.readout) {
+          throw new Error(data.error || "No readout returned");
         }
+        setReadout(data.readout);
+        posthog.capture("score_generated", {
+          score,
+          tier: tier.label,
+        });
       } catch (err) {
         console.error("Failed to generate readout:", err);
         setReadout(
@@ -171,7 +174,14 @@ function ResultContent() {
         </div>
       )}
 
-      <ShareButton score={score} tierLabel={tier.label} inputs={inputs} />
+      <ShareButton
+        score={score}
+        tier={tier}
+        readout={readout || ""}
+        streak={streak}
+        inputs={inputs}
+        username={username.trim() || undefined}
+      />
 
       <Link
         href="/leaderboard"

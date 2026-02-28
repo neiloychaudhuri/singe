@@ -9,7 +9,19 @@ interface Props {
   highest: { score: number; date: string } | null;
 }
 
+// Convert a "YYYY-MM-DD" string to a display string like "Feb 28"
+// Uses the local-time Date constructor to avoid UTC-parsing off-by-one
+function formatDateStr(dateStr: string): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export default function StreakWidget({ streak, last7Days, highest }: Props) {
+  // dayLabels is Monday-first; getDay() is Sunday-first (0=Sun).
+  // Convert: (sundayFirstIdx + 6) % 7  →  mondayFirstIdx
   const dayLabels = ["M", "T", "W", "T", "F", "S", "S"];
   const today = new Date();
   const startDayIdx = new Date(
@@ -39,7 +51,7 @@ export default function StreakWidget({ streak, last7Days, highest }: Props) {
                 title={entry ? `Score: ${entry.score}` : "No entry"}
               />
               <span className="text-zinc-500 text-xs font-medium">
-                {dayLabels[dayIdx]}
+                {dayLabels[(dayIdx + 6) % 7]}
               </span>
             </div>
           );
@@ -50,7 +62,7 @@ export default function StreakWidget({ streak, last7Days, highest }: Props) {
         <div className="text-zinc-500 text-sm border-t border-zinc-800 pt-3">
           All-time best:{" "}
           <span className="text-zinc-300 font-bold">{highest.score}</span>
-          <span className="text-zinc-600 ml-1">({highest.date})</span>
+          <span className="text-zinc-600 ml-1">({formatDateStr(highest.date)})</span>
         </div>
       )}
     </div>

@@ -10,6 +10,8 @@ interface Props {
   inputs: FormInputs;
   format: "square" | "story";
   username?: string;
+  id?: string;
+  isPreview?: boolean;
 }
 
 export default function ExportCard({
@@ -20,6 +22,8 @@ export default function ExportCard({
   inputs,
   format,
   username,
+  id,
+  isPreview,
 }: Props) {
   const width = 540;
   const height = format === "square" ? 540 : 960;
@@ -49,12 +53,12 @@ export default function ExportCard({
 
   return (
     <div
-      id={`export-card-${format}`}
+      id={id ?? `export-card-${format}`}
       style={{
         width: `${width}px`,
         height: `${height}px`,
-        position: "absolute",
-        left: "-9999px",
+        position: isPreview ? "relative" : "absolute",
+        left: isPreview ? 0 : "-9999px",
         top: 0,
         background: "#09090b",
         color: "#ffffff",
