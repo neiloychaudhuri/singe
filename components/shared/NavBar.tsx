@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const XIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -27,10 +28,19 @@ const CoffeeIcon = () => (
 );
 
 export default function NavBar() {
+  const pathname = usePathname();
+
+  const handleSingeClick = () => {
+    if (pathname === "/") {
+      window.dispatchEvent(new CustomEvent("singe:reset"));
+    }
+  };
+
   return (
     <nav className="w-full flex items-center justify-between px-4 sm:px-6 py-4 border-b border-zinc-800/50">
       <Link
         href="/"
+        onClick={handleSingeClick}
         className="text-zinc-400 text-sm font-medium hover:underline underline-offset-4 decoration-yellow-400 transition-all shrink-0"
       >
         <span className="text-zinc-100 font-bold">singe</span>
