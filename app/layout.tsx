@@ -14,14 +14,14 @@ export const metadata: Metadata = {
     description:
       "A brutally honest, AI-powered life assessment tool that tells you exactly how cooked you are — then hypes you up anyway.",
     type: "website",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/singe-thumbnail.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Singe — How Cooked Are You?",
     description:
       "A brutally honest, AI-powered life assessment tool that tells you exactly how cooked you are — then hypes you up anyway.",
-    images: ["/opengraph-image"],
+    images: ["/singe-thumbnail.png"],
   },
 };
 
