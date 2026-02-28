@@ -16,7 +16,7 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
 
   const elementId = `export-card-${format}`;
-  const siteUrl = "https://getsinged.vercel.app";
+  const siteUrl = "https://getsinged.com";
   const shareText = `I scored ${score}/100 on Singe — ${tierLabel}. How cooked are you?`;
 
   // Emoji text fallback used when the image card can't be rendered

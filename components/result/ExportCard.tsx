@@ -280,7 +280,7 @@ export default function ExportCard({
             letterSpacing: "0.05em",
           }}
         >
-          getsinged.vercel.app
+          getsinged.com
         </span>
       </div>
     </div>
