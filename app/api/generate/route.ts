@@ -16,7 +16,10 @@ export async function POST(req: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      generationConfig: { temperature: 1.2 },
+    });
     const prompt = buildPrompt(inputs, score, tier);
     const result = await model.generateContent(prompt);
     const readout = result.response.text();
