@@ -6,7 +6,14 @@ export function buildPrompt(inputs: FormInputs, score: number, tier: Tier): stri
 Stats: ${inputs.sleepHours}h sleep, ${inputs.coffees} coffees, ${inputs.tabs} tabs, ${inputs.hoursToDeadline}h to deadline, ${inputs.hoursSinceGrass}h no outside.
 Score: ${score}/100 — ${tier.label}. Tone: ${tier.tone}.
 
-Rules: ref at least 1 stat, Comedy Central roast energy, don't use the phrase "no cap", employ the modern use of ebonics, Gen Alpha brainrot slang naturally, never start with "I"/"Wow"/"It sounds like", no generic advice.
+Rules: ref at least 1 stat,
+99 characters or less,
+Comedy Central roast energy,
+don't use the phrase "no cap",
+employ the modern use of ebonics,
+Gen Alpha brainrot slang naturally,
+never start with "I"/"Wow"/"It sounds like",
+no generic advice.
 
 Reply with only the sentence.`.trim();
 }
