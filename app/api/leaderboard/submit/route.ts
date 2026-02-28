@@ -13,8 +13,8 @@ export async function POST(req: Request) {
     }
 
     const sanitizedUsername = username
-      ? username.trim().slice(0, 20).replace(/[^a-zA-Z0-9_.-]/g, "")
-      : null;
+      ? username.trim().slice(0, 20).replace(/[^a-zA-Z0-9_.-]/g, "") || "Unknown Singe"
+      : "Unknown Singe";
 
     const sanitizedSchool =
       typeof school === "string" && school.trim().length > 0
