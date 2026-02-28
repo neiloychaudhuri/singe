@@ -14,7 +14,8 @@ interface Props {
 export default function ShareButton({ score, tierLabel, inputs }: Props) {
   const [format, setFormat] = useState<"square" | "story">("square");
   const [busy, setBusy] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [toastKey, setToastKey] = useState(0);
 
   const elementId = `export-card-${format}`;
   const siteUrl = "https://getsinged.vercel.app";
@@ -31,6 +32,12 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
       ].join(" • ") +
       `\n🔥 ${score}/100 — ${tierLabel}. How cooked are you?\n${siteUrl}`
     : `${shareText}\n${siteUrl}`;
+
+  function showToast(msg: string) {
+    setToast(msg);
+    setToastKey((k) => k + 1);
+    setTimeout(() => setToast(null), 2000);
+  }
 
   /** Renders the card blob and creates a shareable File, or returns null on failure */
   async function getCardFile(): Promise<File | null> {
@@ -64,29 +71,26 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
 
   const handleCopy = async () => {
     setBusy("copy");
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     try {
-      const file = await getCardFile();
-      if (!file) throw new Error("No card");
+      const blob = await renderCardToBlob(elementId);
+      if (!blob) throw new Error("No blob");
 
-      // Try native clipboard first (Safari 16.4+, desktop Chrome)
-      let clipboardOk = false;
+      // Try image clipboard first (Safari 16.4+, desktop Chrome)
+      let ok = false;
       try {
-        await navigator.clipboard.write([new ClipboardItem({ "image/png": file })]);
-        clipboardOk = true;
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        ok = true;
       } catch {
-        // Clipboard API unavailable (e.g. Chrome/Firefox on iOS)
+        // Image clipboard not available — fall back to text
       }
 
-      if (clipboardOk) {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        posthog.capture("card_exported", { format, method: "copy" });
-      } else if (isMobile && navigator.share && navigator.canShare?.({ files: [file] })) {
-        // Fallback: share sheet — user can long-press → Copy Image
-        await navigator.share({ files: [file] });
-        posthog.capture("card_exported", { format, method: "copy_share_fallback" });
+      if (!ok) {
+        // Write stats text as plain text fallback; still nothing opens
+        await navigator.clipboard.writeText(statsFallbackText);
       }
+
+      showToast("Copied to clipboard");
+      posthog.capture("card_exported", { format, method: ok ? "copy_image" : "copy_text" });
     } catch (err) {
       console.error("Copy failed:", err);
     } finally {
@@ -96,30 +100,34 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
 
   const handleTweet = async () => {
     setBusy("tweet");
-    const twitterWebUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(statsFallbackText)}`;
+    const tweetText = `${shareText}\n\n${siteUrl}`;
+    const twitterWebUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-    try {
-      const file = await getCardFile();
+    posthog.capture("card_exported", { format, method: isMobile ? "tweet_mobile" : "tweet" });
 
-      if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
-        // Share sheet with image pre-loaded — user picks Twitter and image is ready to send
-        await navigator.share({ files: [file], text: `${shareText}\n\n${siteUrl}` });
-        posthog.capture("card_exported", { format, method: "tweet_share_image" });
-        return;
-      }
+    if (isMobile) {
+      const twitterAppUrl = `twitter://post?message=${encodeURIComponent(tweetText)}`;
 
-      // Fallback: open Twitter web intent with emoji stats (no download)
-      posthog.capture("card_exported", { format, method: "tweet_text_fallback" });
-      window.open(twitterWebUrl, "_blank", "noopener,noreferrer");
-    } catch (err) {
-      // User cancelled → don't open Twitter
-      if ((err as Error)?.name !== "AbortError") {
+      // If the Twitter app opens the browser goes to background — cancel the web fallback
+      const fallbackTimer = setTimeout(() => {
         window.open(twitterWebUrl, "_blank", "noopener,noreferrer");
-      }
-      console.error("Tweet share failed:", err);
-    } finally {
-      setBusy(null);
+      }, 1500);
+
+      document.addEventListener(
+        "visibilitychange",
+        () => {
+          if (document.hidden) clearTimeout(fallbackTimer);
+        },
+        { once: true }
+      );
+
+      window.location.href = twitterAppUrl;
+    } else {
+      window.open(twitterWebUrl, "_blank", "noopener,noreferrer");
     }
+
+    setBusy(null);
   };
 
   const handleSMS = async () => {
@@ -128,13 +136,11 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
       const file = await getCardFile();
 
       if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
-        // Share sheet with image — works for iMessage, WhatsApp, etc.
         await navigator.share({ files: [file], text: `${shareText} ${siteUrl}` });
         posthog.capture("card_exported", { format, method: "sms_share_image" });
         return;
       }
 
-      // Fallback: SMS deep link with emoji stats text (no download)
       posthog.capture("card_exported", { format, method: "sms_text_fallback" });
       window.open(`sms:?&body=${encodeURIComponent(statsFallbackText)}`, "_self");
     } catch (err) {
@@ -156,7 +162,6 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
         return;
       }
 
-      // Fallback: text-only share (no download)
       if (navigator.share) {
         await navigator.share({ text: statsFallbackText });
         posthog.capture("card_exported", { format, method: "native_share_text" });
@@ -172,96 +177,66 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
     typeof navigator !== "undefined" && !!navigator.share;
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full max-w-sm">
-      <div className="flex gap-2">
-        <button
-          onClick={() => setFormat("square")}
-          className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
-            format === "square"
-              ? "bg-zinc-100 text-zinc-950"
-              : "bg-zinc-800 text-zinc-400 hover:text-zinc-300"
-          }`}
+    <>
+      {toast && (
+        <div
+          key={toastKey}
+          className="fixed bottom-8 left-1/2 z-50 bg-zinc-700 text-zinc-100 text-sm font-medium px-4 py-2.5 rounded-lg shadow-lg animate-toast pointer-events-none whitespace-nowrap"
         >
-          Square
-        </button>
-        <button
-          onClick={() => setFormat("story")}
-          className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
-            format === "story"
-              ? "bg-zinc-100 text-zinc-950"
-              : "bg-zinc-800 text-zinc-400 hover:text-zinc-300"
-          }`}
-        >
-          Story
-        </button>
-      </div>
+          {toast}
+        </div>
+      )}
 
-      <div className="grid grid-cols-2 gap-2 w-full">
-        <button
-          onClick={handleSave}
-          disabled={!!busy}
-          className="flex items-center justify-center gap-2 px-4 py-3 bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 text-black font-bold rounded-lg transition-colors text-sm"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          {busy === "download" ? "Saving..." : "Save"}
-        </button>
-
-        <button
-          onClick={handleCopy}
-          disabled={!!busy}
-          className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-100 font-bold rounded-lg transition-colors text-sm"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-          </svg>
-          {copied ? "Copied!" : busy === "copy" ? "Copying..." : "Copy"}
-        </button>
-
-        <button
-          onClick={handleTweet}
-          disabled={!!busy}
-          className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-100 font-bold rounded-lg transition-colors text-sm"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-          </svg>
-          {busy === "tweet" ? "Opening..." : "Tweet"}
-        </button>
-
-        {supportsNativeShare ? (
+      <div className="flex flex-col items-center gap-4 w-full max-w-sm">
+        <div className="flex gap-2">
           <button
-            onClick={handleNativeShare}
+            onClick={() => setFormat("square")}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+              format === "square"
+                ? "bg-zinc-100 text-zinc-950"
+                : "bg-zinc-800 text-zinc-400 hover:text-zinc-300"
+            }`}
+          >
+            Square
+          </button>
+          <button
+            onClick={() => setFormat("story")}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
+              format === "story"
+                ? "bg-zinc-100 text-zinc-950"
+                : "bg-zinc-800 text-zinc-400 hover:text-zinc-300"
+            }`}
+          >
+            Story
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 w-full">
+          <button
+            onClick={handleSave}
+            disabled={!!busy}
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 text-black font-bold rounded-lg transition-colors text-sm"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            {busy === "download" ? "Saving..." : "Save"}
+          </button>
+
+          <button
+            onClick={handleCopy}
             disabled={!!busy}
             className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-100 font-bold rounded-lg transition-colors text-sm"
           >
@@ -276,17 +251,14 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <circle cx="18" cy="5" r="3" />
-              <circle cx="6" cy="12" r="3" />
-              <circle cx="18" cy="19" r="3" />
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
             </svg>
-            {busy === "share" ? "Sharing..." : "Share"}
+            {busy === "copy" ? "Copying..." : "Copy"}
           </button>
-        ) : (
+
           <button
-            onClick={handleSMS}
+            onClick={handleTweet}
             disabled={!!busy}
             className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-100 font-bold rounded-lg transition-colors text-sm"
           >
@@ -295,18 +267,62 @@ export default function ShareButton({ score, tierLabel, inputs }: Props) {
               width="16"
               height="16"
               viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              fill="currentColor"
             >
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
             </svg>
-            {busy === "sms" ? "Opening..." : "Text"}
+            {busy === "tweet" ? "Opening..." : "Tweet"}
           </button>
-        )}
+
+          {supportsNativeShare ? (
+            <button
+              onClick={handleNativeShare}
+              disabled={!!busy}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-100 font-bold rounded-lg transition-colors text-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+              </svg>
+              {busy === "share" ? "Sharing..." : "Share"}
+            </button>
+          ) : (
+            <button
+              onClick={handleSMS}
+              disabled={!!busy}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-100 font-bold rounded-lg transition-colors text-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              {busy === "sms" ? "Opening..." : "Text"}
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

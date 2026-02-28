@@ -21,6 +21,7 @@ export default function StepGrass({ value, onChange, onSubmit, onNext, onBack }:
           <span className="text-zinc-400">(</span>
           <span className="syntax-string">lastTime</span>
           <span className="text-zinc-400">)</span>
+          <span className="text-zinc-600 text-lg font-normal"> (been outside)</span>
         </h2>
         <p className="text-zinc-600 text-sm mt-2">How long since you last went outside?</p>
       </div>

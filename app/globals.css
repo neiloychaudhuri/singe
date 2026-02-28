@@ -72,3 +72,14 @@ input[type="range"]::-moz-range-thumb {
 .animate-fade-in-up {
   animation: fadeInUp 0.5s ease-out forwards;
 }
+
+@keyframes toastPop {
+  0%   { opacity: 0; transform: translate(-50%, 8px); }
+  15%  { opacity: 1; transform: translate(-50%, 0);   }
+  75%  { opacity: 1; transform: translate(-50%, 0);   }
+  100% { opacity: 0; transform: translate(-50%, 0);   }
+}
+
+.animate-toast {
+  animation: toastPop 2s ease-out forwards;
+}
