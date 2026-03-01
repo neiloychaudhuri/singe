@@ -78,8 +78,14 @@ export default function NavBar() {
           <span className="hidden sm:inline text-sm">buy me a coffee</span>
         </a>
         <Link
+          href="/streak"
+          className="text-zinc-100 font-bold text-sm transition-all hover:underline underline-offset-4 decoration-yellow-400"
+        >
+          streak
+        </Link>
+        <Link
           href="/leaderboard"
-          className="text-zinc-600 hover:text-zinc-300 text-sm transition-colors"
+          className="text-zinc-100 font-bold text-sm transition-all hover:underline underline-offset-4 decoration-yellow-400"
         >
           leaderboard
         </Link>
