@@ -99,9 +99,12 @@ function ResultContent() {
           school: school || null,
         }),
       });
-      if (res.status === 429) {
+      if (!res.ok) {
         const data = await res.json();
-        setSubmitError(data.error || "Already submitted today.");
+        setSubmitError(
+          data.error ||
+            (res.status === 429 ? "Already submitted today." : "Something went wrong.")
+        );
         return;
       }
       setLeaderboardSubmitted(true);

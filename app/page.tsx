@@ -41,6 +41,12 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [started]);
 
+  useEffect(() => {
+    const handler = () => setStarted(false);
+    window.addEventListener("singe:reset", handler);
+    return () => window.removeEventListener("singe:reset", handler);
+  }, []);
+
   if (started) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] py-4 md:py-8">
