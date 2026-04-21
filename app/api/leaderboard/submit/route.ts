@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       ? username.trim().slice(0, 20).replace(/[^a-zA-Z0-9_.-]/g, "") || "Unknown Singe"
       : "Unknown Singe";
 
-    if (username && containsSlur(username)) {
+    if (sanitizedUsername !== "Unknown Singe" && containsSlur(sanitizedUsername)) {
       return NextResponse.json(
         { error: "Username contains prohibited language." },
         { status: 400 }
