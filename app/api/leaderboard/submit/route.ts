@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase";
+import { containsSlur } from "@/lib/profanity-filter";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -15,6 +16,13 @@ export async function POST(req: Request) {
     const sanitizedUsername = username
       ? username.trim().slice(0, 20).replace(/[^a-zA-Z0-9_.-]/g, "") || "Unknown Singe"
       : "Unknown Singe";
+
+    if (username && containsSlur(username)) {
+      return NextResponse.json(
+        { error: "Username contains prohibited language." },
+        { status: 400 }
+      );
+    }
 
     const sanitizedSchool =
       typeof school === "string" && school.trim().length > 0
